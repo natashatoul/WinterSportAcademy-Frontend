@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react'
+import React, { Fragment, useEffect, useState } from 'react'
 import api from '../services/api'
+
 
 function AdminPage() {
   const [activeTab, setActiveTab] = useState('trainees')
@@ -20,12 +21,16 @@ function AdminPage() {
         <li className="nav-item">
           <button className={`nav-link ${activeTab === 'sessions' ? 'active' : ''}`} onClick={() => setActiveTab('sessions')}>Sessions</button>
         </li>
+        <li className="nav-item">
+          <button className={`nav-link ${activeTab === 'registrations' ? 'active' : ''}`} onClick={() => setActiveTab('registrations')}>Registrations</button>
+        </li>
       </ul>
 
       {activeTab === 'trainees' && <TraineesTab />}
       {activeTab === 'instructors' && <InstructorsTab />}
       {activeTab === 'equipment' && <EquipmentTab />}
       {activeTab === 'sessions' && <SessionsTab />}
+      {activeTab === 'registrations' && <RegistrationsTab />}
     </div>
   )
 }
@@ -382,14 +387,20 @@ function EquipmentTab() {
 function SessionsTab() {
   const [items, setItems] = useState([])
   const [instructors, setInstructors] = useState([])
+  const [trainees, setTrainees] = useState([])
+  const [registrations, setRegistrations] = useState([])
   const [showForm, setShowForm] = useState(false)
   const [editing, setEditing] = useState(null)
   const [form, setForm] = useState({ title: '', startTime: '', instructorId: '' })
+  const [enrollingSessionId, setEnrollingSessionId] = useState(null)
+  const [selectedTraineeId, setSelectedTraineeId] = useState('')
   const [error, setError] = useState('')
 
   useEffect(() => {
     loadSessions()
     loadInstructors()
+    loadTrainees()
+    loadRegistrations()
   }, [])
 
   const loadSessions = () => {
@@ -403,6 +414,18 @@ function SessionsTab() {
     api.get('/Instructors')
       .then(res => setInstructors(res.data))
       .catch(() => setError('Failed to load instructors'))
+  }
+
+  const loadTrainees = () => {
+    api.get('/Trainees')
+      .then(res => setTrainees(res.data))
+      .catch(() => setError('Failed to load trainees'))
+  }
+
+  const loadRegistrations = () => {
+    api.get('/Registrations')
+      .then(res => setRegistrations(res.data))
+      .catch(() => setError('Failed to load registrations'))
   }
 
   const formatDateForInput = (dateString) => {
@@ -463,6 +486,36 @@ function SessionsTab() {
     } catch { setError('Failed to delete') }
   }
 
+  const handleEnroll = async () => {
+    setError('')
+
+    const traineeIdInt = parseInt(selectedTraineeId, 10)
+    if (!enrollingSessionId || isNaN(traineeIdInt)) {
+      setError('Please select a trainee')
+      return
+    }
+
+    try {
+      await api.post('/Registrations', {
+        registrationNumber: 0,
+        traineeId: traineeIdInt,
+        trainingSessionId: enrollingSessionId,
+        registrationTime: new Date().toISOString(),
+        isConfirmed: false
+      })
+      loadRegistrations()
+      setEnrollingSessionId(null)
+      setSelectedTraineeId('')
+    } catch (err) {
+      setError(
+        err.response?.data?.message ||
+        err.response?.data?.detailed ||
+        err.response?.data ||
+        'Failed to enroll trainee'
+      )
+    }
+  }
+
   const handleToggleForm = () => {
     if (showForm) {
       resetForm()
@@ -507,18 +560,191 @@ function SessionsTab() {
         </div>
       )}
       <table className="table table-striped">
-        <thead><tr><th>Title</th><th>Date</th><th>Instructor</th><th>Actions</th></tr></thead>
+        <thead><tr><th>ID</th><th>Title</th><th>Date</th><th>Instructor</th><th>Actions</th></tr></thead>
         <tbody>
           {items.map(item => {
             const instructor = instructors.find(i => i.instructorId === item.instructorId)
+            const currentSessionTime = item.formattedStartTime
+            const busyTraineeIds = registrations
+              .filter(registration => {
+                if (registration.trainingSessionId === item.trainingSessionId) return false
+                const registeredSession = items.find(session => session.trainingSessionId === registration.trainingSessionId)
+                return registeredSession?.formattedStartTime === currentSessionTime
+              })
+              .map(registration => registration.traineeId)
+            const availableTrainees = trainees.filter(trainee => !busyTraineeIds.includes(trainee.traineeId))
+
             return (
-              <tr key={item.trainingSessionId}>
-                <td>{item.title}</td>
-                <td>{item.formattedStartTime}</td>
-                <td>#{item.instructorId} {instructor?.firstName} {instructor?.lastName}</td>
+              <Fragment key={item.trainingSessionId}>
+                <tr key={item.trainingSessionId}>
+                  <td>{item.trainingSessionId}</td>
+                  <td>{item.title}</td>
+                  <td>{item.formattedStartTime}</td>
+                  <td>#{item.instructorId} {instructor?.firstName} {instructor?.lastName}</td>
+                  <td>
+                    <button className="btn btn-warning btn-sm me-2" onClick={() => handleEdit(item)}>Edit</button>
+                    <button className="btn btn-primary btn-sm me-2" onClick={() => {
+                      setEnrollingSessionId(item.trainingSessionId)
+                      setSelectedTraineeId('')
+                      setError('')
+                    }}>
+                      Enroll
+                    </button>
+                    <button className="btn btn-danger btn-sm" onClick={() => handleDelete(item.trainingSessionId)}>Delete</button>
+                  </td>
+                </tr>
+                {enrollingSessionId === item.trainingSessionId && (
+                  <tr key={`enroll-${item.trainingSessionId}`}>
+                    <td colSpan="5">
+                      <div className="d-flex gap-2 align-items-center flex-wrap">
+                        <select className="form-control" style={{ maxWidth: '320px' }} value={selectedTraineeId} onChange={e => setSelectedTraineeId(e.target.value)}>
+                          <option value="">Select trainee</option>
+                          {availableTrainees.map(trainee => (
+                            <option key={trainee.traineeId} value={trainee.traineeId}>
+                              {trainee.firstName} {trainee.lastName}
+                            </option>
+                          ))}
+                        </select>
+                        <button className="btn btn-success btn-sm" onClick={handleEnroll}>Confirm Enroll</button>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </Fragment>
+            )
+          })}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
+function RegistrationsTab() {
+  const [items, setItems] = useState([])
+  const [trainees, setTrainees] = useState([])
+  const [sessions, setSessions] = useState([])
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    loadRegistrations()
+    loadTrainees()
+    loadSessions()
+  }, [])
+
+  const formatDateForInput = (dateString) => {
+    if (!dateString) return ''
+    const date = new Date(dateString)
+    const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+    return localDate.toISOString().slice(0, 16)
+  }
+
+  const getSessionTimeKey = (session) => {
+    if (!session) return ''
+    if (session.startTime) {
+      return String(new Date(session.startTime).getTime())
+    }
+    return session.formattedStartTime || ''
+  }
+
+  const getRegistrationSessionTimeKey = (registration) => {
+    if (registration.trainingSession?.startTime) {
+      return String(new Date(registration.trainingSession.startTime).getTime())
+    }
+    if (registration.trainingSession?.formattedStartTime) {
+      return registration.trainingSession.formattedStartTime
+    }
+    const registeredSession = items.find(session => session.trainingSessionId === registration.trainingSessionId)
+    return getSessionTimeKey(registeredSession)
+  }
+
+  const formatDisplayDate = (dateString) => {
+    if (!dateString) return ''
+    const date = new Date(dateString)
+    if (date.getFullYear() <= 1) return ''
+    return date.toLocaleString('en-GB', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  }
+
+  const loadRegistrations = () => {
+    setError('')
+    api.get('/Registrations')
+      .then(res => setItems(res.data))
+      .catch(() => setError('Failed to load registrations'))
+  }
+
+  const loadTrainees = () => {
+    api.get('/Trainees')
+      .then(res => setTrainees(res.data))
+      .catch(() => setError('Failed to load trainees'))
+  }
+
+  const loadSessions = () => {
+    api.get('/TrainingSessions')
+      .then(res => setSessions(res.data))
+      .catch(() => setError('Failed to load sessions'))
+  }
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure?')) return
+    setError('')
+    try {
+      await api.delete(`/Registrations/${id}`)
+      loadRegistrations()
+    } catch {
+      setError('Failed to delete')
+    }
+  }
+
+  const handleToggleConfirmed = async (item) => {
+    setError('')
+
+    try {
+      const payload = {
+        registrationNumber: item.registrationNumber,
+        traineeId: item.traineeId,
+        trainingSessionId: item.trainingSessionId,
+        registrationTime: item.registrationTime,
+        isConfirmed: !item.isConfirmed
+      }
+
+      await api.put(`/Registrations/${item.registrationNumber}`, payload)
+      loadRegistrations()
+    } catch {
+      setError('Failed to update registration')
+    }
+  }
+
+  return (
+    <div>
+      <div className="d-flex justify-content-between mb-3">
+        <h4>Registrations</h4>
+      </div>
+      {error && <div className="alert alert-danger">{error}</div>}
+      <table className="table table-striped">
+        <thead><tr><th>#</th><th>Trainee</th><th>Session</th><th>Session Time</th><th>Registration Time</th><th>Confirmed</th><th>Actions</th></tr></thead>
+        <tbody>
+          {items.map(item => {
+            const trainee = trainees.find(t => t.traineeId === item.traineeId)
+            const session = sessions.find(s => s.trainingSessionId === item.trainingSessionId)
+
+            return (
+              <tr key={item.registrationNumber}>
+                <td>{item.registrationNumber}</td>
+                <td>{trainee ? `${trainee.firstName} ${trainee.lastName}` : `#${item.traineeId}`}</td>
+                <td>{session ? session.title : `#${item.trainingSessionId}`}</td>
+                <td>{session?.formattedStartTime || ''}</td>
+                <td>{formatDisplayDate(item.registrationTime)}</td>
+                <td>{item.isConfirmed ? 'Yes' : 'No'}</td>
                 <td>
-                  <button className="btn btn-warning btn-sm me-2" onClick={() => handleEdit(item)}>Edit</button>
-                  <button className="btn btn-danger btn-sm" onClick={() => handleDelete(item.trainingSessionId)}>Delete</button>
+                  <button className="btn btn-warning btn-sm me-2" onClick={() => handleToggleConfirmed(item)}>
+                    {item.isConfirmed ? 'Unconfirm' : 'Confirm'}
+                  </button>
+                  <button className="btn btn-danger btn-sm" onClick={() => handleDelete(item.registrationNumber)}>Delete</button>
                 </td>
               </tr>
             )
