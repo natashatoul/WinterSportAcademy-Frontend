@@ -11,10 +11,11 @@ function Navbar() {
   }
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav className="navbar navbar-expand-lg navbar-dark" style={{backgroundColor: '#2196F3'}}>
+        
       <div className="container">
         <Link className="navbar-brand" to="/">Winter Sport Academy</Link>
-        <div className="navbar-nav ms-auto">
+        <div className="navbar-nav ms-auto gap-4">
           <Link className="nav-link" to="/">Sessions</Link>
           <Link className="nav-link" to="/equipment">Equipment</Link>
           <Link className="nav-link" to="/instructors">Instructors</Link>
