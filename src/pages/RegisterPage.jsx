@@ -1,34 +1,54 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
 import api from '../services/api'
 
-function LoginPage() {
+function RegisterPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [message, setMessage] = useState('')
   const [error, setError] = useState('')
-  const { login } = useAuth()
   const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
+    setMessage('')
+
     try {
-      const response = await api.post('/Account/login', { email, password })
-      const token = response.data.token
-      const payload = JSON.parse(atob(token.split('.')[1]))
-      const role = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || ''
-      login(token, role)
-      navigate('/')
+      const response = await api.post('/Account/register', { email, password })
+      const successMessage = typeof response.data === 'string'
+        ? response.data
+        : 'Registration successful. Please log in.'
+      setMessage(successMessage)
+      setTimeout(() => navigate('/login'), 1500)
     } catch (err) {
-      setError('Неверный email или пароль')
+      const data = err.response?.data
+
+      if (typeof data === 'string') {
+        setError(data)
+        return
+      }
+
+      if (Array.isArray(data)) {
+        setError(data.map(item => item.description || item.code).join(', '))
+        return
+      }
+
+      if (data?.errors) {
+        const messages = Object.values(data.errors).flat().join(', ')
+        setError(messages || 'Registration failed')
+        return
+      }
+
+      setError(data?.message || 'Registration failed')
     }
   }
 
   return (
     <div className="row justify-content-center">
       <div className="col-md-4">
-        <h2 className="mb-4">Login</h2>
+        <h2 className="mb-4">Sign Up</h2>
+        {message && <div className="alert alert-success">{message}</div>}
         {error && <div className="alert alert-danger">{error}</div>}
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
@@ -51,14 +71,14 @@ function LoginPage() {
               required
             />
           </div>
-          <button type="submit" className="btn btn-primary w-100">Login</button>
+          <button type="submit" className="btn btn-primary w-100">Create Account</button>
         </form>
         <p className="mt-3 text-center">
-          Don&apos;t have an account? <Link to="/register">Sign up</Link>
+          Already have an account? <Link to="/login">Login</Link>
         </p>
       </div>
     </div>
   )
 }
 
-export default LoginPage
+export default RegisterPage

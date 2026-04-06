@@ -2,10 +2,12 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
 import Navbar from './components/Navbar'
 import LoginPage from './pages/LoginPage'
+import RegisterPage from './pages/RegisterPage'
 import EquipmentPage from './pages/EquipmentPage'
 import InstructorsPage from './pages/InstructorsPage'
 import SessionsPage from './pages/SessionsPage'
 import AdminPage from './pages/AdminPage'
+import MyRegistrationsPage from './pages/MyRegistrationsPage'
 
 function ProtectedRoute({ children }) {
   const { token, role } = useAuth()
@@ -22,8 +24,10 @@ function App() {
         <Routes>
           <Route path="/" element={<SessionsPage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
           <Route path="/equipment" element={<EquipmentPage />} />
           <Route path="/instructors" element={<InstructorsPage />} />
+          <Route path="/my-registrations" element={<MyRegistrationsPage />} />
           <Route path="/admin" element={
             <ProtectedRoute>
               <AdminPage />

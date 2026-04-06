@@ -2,7 +2,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
 function Navbar() {
-  const { token, role, logout } = useAuth()
+  const { token, role, email, logout } = useAuth()
   const navigate = useNavigate()
 
   const handleLogout = () => {
@@ -11,8 +11,7 @@ function Navbar() {
   }
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark" style={{backgroundColor: '#2196F3'}}>
-        
+    <nav className="navbar navbar-expand-lg navbar-dark" style={{ backgroundColor: '#2196F3' }}>
       <div className="container">
         <Link className="navbar-brand" to="/">Winter Sport Academy</Link>
         <div className="navbar-nav ms-auto gap-4">
@@ -21,6 +20,12 @@ function Navbar() {
           <Link className="nav-link" to="/instructors">Instructors</Link>
           {token && role === 'Admin' && (
             <Link className="nav-link" to="/admin">Admin</Link>
+          )}
+          {token && role !== 'Admin' && (
+            <Link className="nav-link" to="/my-registrations">My Registrations</Link>
+          )}
+          {token && email && (
+            <span className="navbar-text text-white-50">{email}</span>
           )}
           {token ? (
             <button className="btn btn-outline-light ms-2" onClick={handleLogout}>Logout</button>
