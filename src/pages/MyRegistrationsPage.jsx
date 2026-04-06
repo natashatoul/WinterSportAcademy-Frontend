@@ -60,7 +60,6 @@ function MyRegistrationsPage() {
                 <th>#</th>
                 <th>Session</th>
                 <th>Session Time</th>
-                <th>Registered At</th>
                 <th>Status</th>
               </tr>
             </thead>
@@ -69,8 +68,12 @@ function MyRegistrationsPage() {
                 <tr key={registration.registrationNumber}>
                   <td>{registration.registrationNumber}</td>
                   <td>{registration.trainingSession?.title || `Session #${registration.trainingSessionId}`}</td>
-                  <td>{registration.trainingSession?.formattedStartTime || 'N/A'}</td>
-                  <td>{new Date(registration.registrationTime).toLocaleString()}</td>
+                  <td>
+                    {registration.trainingSession?.formattedStartTime
+                      || (registration.trainingSession?.startTime
+                        ? new Date(registration.trainingSession.startTime).toLocaleString()
+                        : 'N/A')}
+                  </td>
                   <td>{registration.isConfirmed ? 'Confirmed' : 'Pending'}</td>
                 </tr>
               ))}
