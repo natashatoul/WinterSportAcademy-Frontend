@@ -48,7 +48,7 @@ function EquipmentPage() {
       {error && <div className="alert alert-danger">{error}</div>}
       <div className="row">
         {equipment.map(item => {
-          const isAvailable = item.traineeId == null && item.trainingSessionId == null
+          const isAvailable = item.traineeId == null
 
           return (
             <div className="col-md-4 mb-3" key={item.equipmentId}>
