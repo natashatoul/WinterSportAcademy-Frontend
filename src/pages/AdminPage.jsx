@@ -9,7 +9,7 @@ function AdminPage() {
   const [activeTab, setActiveTab] = useState('trainees')
 
   return (
-    <div>
+    <div className="admin-panel">
       <h2 className="mb-4">Admin Panel</h2>
       <ul className="nav nav-tabs mb-4">
         <li className="nav-item">

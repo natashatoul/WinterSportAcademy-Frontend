@@ -81,7 +81,8 @@ function RegistrationsTab() {
         <h4>Registrations</h4>
       </div>
       {error && <div className="alert alert-danger">{error}</div>}
-      <table className="table table-striped">
+      <div className="table-responsive">
+        <table className="table table-striped">
         <thead><tr><th>#</th><th>Trainee</th><th>Session</th><th>Session Time</th><th>Registration Time</th><th>Confirmed</th><th>Actions</th></tr></thead>
         <tbody>
           {items.map(item => {
@@ -107,6 +108,7 @@ function RegistrationsTab() {
           })}
         </tbody>
       </table>
+      </div>
     </div>
   )
 }

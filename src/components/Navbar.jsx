@@ -15,8 +15,12 @@ function Navbar() {
             <div className="container px-4">
                 <Link className="navbar-brand d-flex align-items-center" to="/">
                     <img src="/src/assets/logo.svg" alt="logo" height="80" />
-                    </Link>
-                <div className="navbar-nav ms-auto gap-4">
+                </Link>
+                <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span className="navbar-toggler-icon"></span>
+                </button>
+                <div className="collapse navbar-collapse" id="navbarNav">
+                    <div className="navbar-nav ms-auto gap-2 gap-lg-4">
                     {role !== 'Admin' && (
                         <>
                             <Link className="nav-link" to="/">Sessions</Link>
@@ -38,6 +42,7 @@ function Navbar() {
                     ) : (
                         <Link className="nav-link" to="/login">Login</Link>
                     )}
+                </div>
                 </div>
             </div>
         </nav>

@@ -53,7 +53,7 @@ function MyRegistrationsPage() {
       )}
 
       {!error && registrations.length > 0 && (
-        <div className="table-responsive">
+        <div className="table-responsive"> // Add responsive wrapper for better mobile display
           <table className="table table-striped">
             <thead>
               <tr>

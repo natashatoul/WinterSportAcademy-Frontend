@@ -135,7 +135,8 @@ function EquipmentTab() {
           </form>
         </div>
       )}
-      <table className="table table-striped">
+      <div className="table-responsive">
+        <table className="table table-striped">
         <thead><tr><th>Name</th><th>Category</th><th>Specification</th><th>Size</th><th>Start</th><th>End</th><th>Trainee ID</th><th>Actions</th></tr></thead>
         <tbody>
           {items.map(item => (
@@ -155,6 +156,7 @@ function EquipmentTab() {
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   )
 }

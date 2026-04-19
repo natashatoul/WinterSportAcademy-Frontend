@@ -83,21 +83,23 @@ function TraineesTab() {
           </form>
         </div>
       )}
-      <table className="table table-striped">
-        <thead><tr><th>Name</th><th>Skill Level</th><th>Actions</th></tr></thead>
-        <tbody>
-          {items.map(item => (
-            <tr key={item.traineeId}>
-              <td>{item.firstName} {item.lastName}</td>
-              <td>{item.skillLevel}</td>
-              <td>
-                <button className="btn btn-warning btn-sm me-2" onClick={() => handleEdit(item)}>Edit</button>
-                <button className="btn btn-danger btn-sm" onClick={() => handleDelete(item.traineeId)}>Delete</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <div className="table-responsive">
+        <table className="table table-striped">
+          <thead><tr><th>Name</th><th>Skill Level</th><th>Actions</th></tr></thead>
+          <tbody>
+            {items.map(item => (
+              <tr key={item.traineeId}>
+                <td>{item.firstName} {item.lastName}</td>
+                <td>{item.skillLevel}</td>
+                <td>
+                  <button className="btn btn-warning btn-sm me-2" onClick={() => handleEdit(item)}>Edit</button>
+                  <button className="btn btn-danger btn-sm" onClick={() => handleDelete(item.traineeId)}>Delete</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   )
 }

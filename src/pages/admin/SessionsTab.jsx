@@ -180,7 +180,8 @@ function SessionsTab() {
           </form>
         </div>
       )}
-      <table className="table table-striped">
+      <div className="table-responsive">
+        <table className="table table-striped">
         <thead><tr><th>ID</th><th>Title</th><th>Date</th><th>Instructor</th><th>Actions</th></tr></thead>
         <tbody>
           {items.map(item => {
@@ -236,6 +237,7 @@ function SessionsTab() {
           })}
         </tbody>
       </table>
+      </div>
     </div>
   )
 }
