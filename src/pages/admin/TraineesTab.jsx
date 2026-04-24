@@ -1,19 +1,15 @@
-import { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import api from '../../services/api'
+import useApiList from '../../hooks/useApiList'
 
 function TraineesTab() {
-  const [items, setItems] = useState([])
+  const { items, error, setError, load } = useApiList({
+    endpoint: '/Trainees',
+    errorMessage: 'Failed to load'
+  })
   const [showForm, setShowForm] = useState(false)
   const [editing, setEditing] = useState(null)
   const [form, setForm] = useState({ firstName: '', lastName: '', skillLevel: '' })
-  const [error, setError] = useState('')
-
-  useEffect(() => { load() }, [])
-
-  const load = () => {
-    setError('')
-    api.get('/Trainees').then(res => setItems(res.data)).catch(() => setError('Failed to load'))
-  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -85,10 +81,11 @@ function TraineesTab() {
       )}
       <div className="table-responsive">
         <table className="table table-striped">
-          <thead><tr><th>Name</th><th>Skill Level</th><th>Actions</th></tr></thead>
+          <thead><tr><th>ID</th><th>Name</th><th>Skill Level</th><th>Actions</th></tr></thead>
           <tbody>
             {items.map(item => (
               <tr key={item.traineeId}>
+                <td>{item.traineeId}</td>
                 <td>{item.firstName} {item.lastName}</td>
                 <td>{item.skillLevel}</td>
                 <td>
