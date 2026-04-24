@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import api from '../services/api'
-import { useAuth } from '../context/AuthContext'
+import { useAuth } from '../context/useAuth'
 
 function MyRegistrationsPage() {
   const { traineeId, token } = useAuth()
@@ -53,7 +53,8 @@ function MyRegistrationsPage() {
       )}
 
       {!error && registrations.length > 0 && (
-        <div className="table-responsive"> // Add responsive wrapper for better mobile display
+        
+        <div className="table-responsive"> 
           <table className="table table-striped">
             <thead>
               <tr>

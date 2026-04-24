@@ -1,14 +1,15 @@
-import { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import api from '../../services/api'
+import useApiList from '../../hooks/useApiList'
 
 function EquipmentTab() {
-  const [items, setItems] = useState([])
+  const { items, error, setError, load } = useApiList({
+    endpoint: '/Equipments',
+    errorMessage: 'Failed to load'
+  })
   const [showForm, setShowForm] = useState(false)
   const [editing, setEditing] = useState(null)
   const [form, setForm] = useState({ itemName: '', itemCategory: '', specification: '', size: '', startTime: '', endTime: '', traineeId: '' })
-  const [error, setError] = useState('')
-
-  useEffect(() => { load() }, [])
 
   const formatDateForInput = (dateString) => {
     if (!dateString) return ''
@@ -34,11 +35,6 @@ function EquipmentTab() {
     setShowForm(false)
     setEditing(null)
     setForm({ itemName: '', itemCategory: '', specification: '', size: '', startTime: '', endTime: '', traineeId: '' })
-  }
-
-  const load = () => {
-    setError('')
-    api.get('/Equipments').then(res => setItems(res.data)).catch(() => setError('Failed to load'))
   }
 
   const handleSubmit = async (e) => {

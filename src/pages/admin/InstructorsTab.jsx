@@ -1,19 +1,15 @@
-import { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import api from '../../services/api'
+import useApiList from '../../hooks/useApiList'
 
 function InstructorsTab() {
-  const [items, setItems] = useState([])
+  const { items, error, setError, load } = useApiList({
+    endpoint: '/Instructors',
+    errorMessage: 'Failed to load'
+  })
   const [showForm, setShowForm] = useState(false)
   const [editing, setEditing] = useState(null)
   const [form, setForm] = useState({ firstName: '', lastName: '', specialisation: '' })
-  const [error, setError] = useState('')
-
-  useEffect(() => { load() }, [])
-
-  const load = () => {
-    setError('')
-    api.get('/Instructors').then(res => setItems(res.data)).catch(() => setError('Failed to load'))
-  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()

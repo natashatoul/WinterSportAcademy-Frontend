@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import api from '../../services/api'
 
 function RegistrationsTab() {
@@ -6,12 +6,6 @@ function RegistrationsTab() {
   const [trainees, setTrainees] = useState([])
   const [sessions, setSessions] = useState([])
   const [error, setError] = useState('')
-
-  useEffect(() => {
-    loadRegistrations()
-    loadTrainees()
-    loadSessions()
-  }, [])
 
   const formatDisplayDate = (dateString) => {
     if (!dateString) return ''
@@ -26,24 +20,30 @@ function RegistrationsTab() {
     })
   }
 
-  const loadRegistrations = () => {
+  function loadRegistrations() {
     setError('')
     api.get('/Registrations')
       .then(res => setItems(res.data))
       .catch(() => setError('Failed to load registrations'))
   }
 
-  const loadTrainees = () => {
+  function loadTrainees() {
     api.get('/Trainees')
       .then(res => setTrainees(res.data))
       .catch(() => setError('Failed to load trainees'))
   }
 
-  const loadSessions = () => {
+  function loadSessions() {
     api.get('/TrainingSessions')
       .then(res => setSessions(res.data))
       .catch(() => setError('Failed to load sessions'))
   }
+
+  useEffect(() => {
+    loadRegistrations()
+    loadTrainees()
+    loadSessions()
+  }, [])
 
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure?')) return

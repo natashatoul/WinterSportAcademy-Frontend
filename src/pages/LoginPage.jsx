@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
+import { useAuth } from '../context/useAuth'
 import api from '../services/api'
 
 function LoginPage() {
@@ -20,7 +20,7 @@ function LoginPage() {
       const role = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || ''
       login(token, role)
       navigate('/')
-    } catch (err) {
+    } catch {
       setError('Неверный email или пароль')
     }
   }

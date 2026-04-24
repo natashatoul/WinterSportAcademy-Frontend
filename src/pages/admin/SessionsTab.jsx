@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from 'react'
+import React, { Fragment, useEffect, useState } from 'react'
 import api from '../../services/api'
 
 function SessionsTab() {
@@ -13,37 +13,37 @@ function SessionsTab() {
   const [selectedTraineeId, setSelectedTraineeId] = useState('')
   const [error, setError] = useState('')
 
-  useEffect(() => {
-    loadSessions()
-    loadInstructors()
-    loadTrainees()
-    loadRegistrations()
-  }, [])
-
-  const loadSessions = () => {
+  function loadSessions() {
     setError('')
     api.get('/TrainingSessions')
       .then(res => setItems(res.data))
       .catch(() => setError('Failed to load sessions'))
   }
 
-  const loadInstructors = () => {
+  function loadInstructors() {
     api.get('/Instructors')
       .then(res => setInstructors(res.data))
       .catch(() => setError('Failed to load instructors'))
   }
 
-  const loadTrainees = () => {
+  function loadTrainees() {
     api.get('/Trainees')
       .then(res => setTrainees(res.data))
       .catch(() => setError('Failed to load trainees'))
   }
 
-  const loadRegistrations = () => {
+  function loadRegistrations() {
     api.get('/Registrations')
       .then(res => setRegistrations(res.data))
       .catch(() => setError('Failed to load registrations'))
   }
+
+  useEffect(() => {
+    loadSessions()
+    loadInstructors()
+    loadTrainees()
+    loadRegistrations()
+  }, [])
 
   const formatDateForInput = (dateString) => {
     if (!dateString) return ''

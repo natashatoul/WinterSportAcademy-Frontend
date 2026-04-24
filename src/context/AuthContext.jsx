@@ -1,6 +1,5 @@
-import { createContext, useContext, useState } from 'react'
-
-const AuthContext = createContext()
+import { useState } from 'react'
+import { AuthContext } from './AuthContextStore'
 
 const decodeTokenPayload = (token) => {
   if (!token) return null
@@ -61,5 +60,3 @@ export function AuthProvider({ children }) {
     </AuthContext.Provider>
   )
 }
-
-export const useAuth = () => useContext(AuthContext)
