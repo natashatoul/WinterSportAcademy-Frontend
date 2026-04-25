@@ -73,21 +73,6 @@ Make sure backend is running before using the app.
 - `npm run test` - run unit tests
 - `npm run test:watch` - run tests in watch mode
 - `npm run test:ui` - run tests with UI
-- `npm run deploy` - build and publish to GitHub Pages (`gh-pages` branch)
-
-## Deploy to GitHub Pages
-
-1. Push your current changes to `main`.
-2. Run:
-
-```bash
-npm run deploy
-```
-
-3. In GitHub repository settings:
-   - `Settings` -> `Pages`
-   - Source: `Deploy from a branch`
-   - Branch: `gh-pages` / folder `/ (root)`
 
 ## Routing
 
