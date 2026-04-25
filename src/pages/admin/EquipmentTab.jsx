@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import * as React from 'react'
+import { useState } from 'react'
 import api from '../../services/api'
 import useApiList from '../../hooks/useApiList'
 
